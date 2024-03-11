@@ -1,10 +1,31 @@
 package com.csis3275.model_group2;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name="product")
 public class Product_group2 {
+	
+	@Id
+	
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private long id;
 	private String name;
 	private String description;
 	private String category;
 	private int quantity;
+	
+	
+	public long getId() {
+		return id;
+	}
+	public void setId(long id) {
+		this.id = id;
+	}
 	public String getName() {
 		return name;
 	}
@@ -35,6 +56,10 @@ public class Product_group2 {
 		this.description = description;
 		this.category = category;
 		this.quantity = quantity;
+	}
+	
+	public Product_group2() {
+		
 	}
 	
 	
