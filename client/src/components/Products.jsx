@@ -1,19 +1,19 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Button, Switch, Table, Tag, Tour } from "antd";
-// import Loader from "./Loader";
+import React, { useState, useRef } from "react";
+import { Button, FloatButton, Switch, Table, Tag, Tour } from "antd";
 import MyDropdown from "./MyDropdown";
 import Search from "antd/es/input/Search";
 import ProductModal from "./ProductModal";
 import ProductsStatistic from "./ProductStats";
 
+import toast, { Toaster } from 'react-hot-toast';
+// import { QuestionOutlined } from "@ant-design/icons";
+
 // Table Component
-const Products = () => {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const Products = ({data, setData, loading, categories, error, fetchData, newRef}) => {
+ 
+
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [resetLoading, setResetLoading] = useState(false);
-  const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [showLowStock, setShowLowStock] = useState(false);
@@ -21,16 +21,18 @@ const Products = () => {
   const [editProductId, setEditProductId] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  
   const ref1 = useRef(null);
   const ref2 = useRef(null);
   const ref3 = useRef(null);
-  const [open, setOpen] = useState(true);
+  // Tour state
+  const [open, setOpen] = useState(false);
 
   // Tour steps
   const steps = [
     {
       title: 'Select category',
-      description: 'Filter by category',
+      description: 'Hover on this button to filter by category',
       target: () => ref1.current,
     },
     {
@@ -47,10 +49,10 @@ const Products = () => {
 
   // Table Columns
   const columns = [
-    {
-      title: "ID",
-      dataIndex: "id",
-    },
+    // {
+    //   title: "ID",
+    //   dataIndex: "id",
+    // },
     {
       title: "Name",
       dataIndex: "name",
@@ -100,6 +102,12 @@ const Products = () => {
       (showLowStock ? item.quantity < 10 : true) // Filter by low stock condition
   );
 
+  // Notification
+  const notify = (type,message) => {
+    type === 'success' ? toast(message) : toast.error(message);
+  };
+
+
   // Search input handler
   const handleSearch = (value) => {
     setSearchTerm(value);
@@ -114,6 +122,7 @@ const Products = () => {
   const start = () => {
     setResetLoading(true);
     // ajax request after empty completing
+    console.log(selectedRowKeys)
     setTimeout(() => {
       setSelectedRowKeys([]);
       setResetLoading(false);
@@ -147,37 +156,7 @@ const Products = () => {
     setIsModalVisible(false);
   };
 
-  const fetchData = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/");
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const result = await response.json();
-      // console.log(result)
-
-      // Extracting unique categories using Set
-      const uniqueCategories = [
-        ...new Set(result.map((item) => item.category)),
-        "All",
-      ];
-
-      // Map the server data to Ant Design table data structure
-      const antDesignData = result.map((item) => ({ ...item, key: item.id }));
-
-      setData(antDesignData);
-      setCategories(uniqueCategories);
-    } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
+  
   if (error) {
     return <p>Error: {error.message}</p>;
   }
@@ -189,7 +168,9 @@ const Products = () => {
         visible={isModalVisible}
         onCancel={handleCancelModal}
         onUpdate={fetchData}
+        notify={notify}
       />
+      <Toaster />
       <Tour
         open={open}
         onClose={() => setOpen(false)}
@@ -200,6 +181,17 @@ const Products = () => {
           </span>
         )}
       />
+      <FloatButton
+      // icon={<QuestionOutlined />}
+      description="Help"
+      onClick={()=>setOpen(true)}
+      type="primary"
+      shape="square"
+      style={{
+        right: 24,
+        padding: 5
+      }}
+    />
 
       <div style={{ padding: "10px" }}>
       <ProductsStatistic products={data} /> 
@@ -226,7 +218,7 @@ const Products = () => {
               loading={resetLoading}
               ref={ref2}
             >
-              Delete Product(s)
+              {selectedRowKeys.length === 1 ? `Delete product` : `Delete products`}
             </Button>
             <span
               style={{

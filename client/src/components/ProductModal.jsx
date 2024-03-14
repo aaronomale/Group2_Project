@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Button } from 'antd';
 
-const ProductModal = ({ productId, visible, onCancel, onUpdate }) => {
+const ProductModal = ({ productId, visible, onCancel, onUpdate, notify }) => {
   const [productData, setProductData] = useState({});
   const [quantityInput, setQuantityInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -49,9 +49,11 @@ const ProductModal = ({ productId, visible, onCancel, onUpdate }) => {
       }
 
       onUpdate(); // Update the data in the parent component
+      notify('success','Product updated successfully');
       onCancel(); // Close the modal
     } catch (error) {
       console.error('Error updating product:', error);
+      notify('error', 'An error occurred while updating');
     } finally {
       setLoading(false);
     }
@@ -65,6 +67,8 @@ const ProductModal = ({ productId, visible, onCancel, onUpdate }) => {
       setProductData({ ...productData, [fieldName]: value });
     }
   };
+
+
 
   return (
     <Modal
@@ -80,6 +84,7 @@ const ProductModal = ({ productId, visible, onCancel, onUpdate }) => {
         </Button>,
       ]}
     >
+    
       <Form>
         <Form.Item label="ID">
           <Input value={productData.id} disabled />
