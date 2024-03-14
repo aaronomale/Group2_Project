@@ -1,7 +1,8 @@
 import React from 'react';
 import { Button, Dropdown, Menu } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 
-const MyDropdown = ({ uniqueCategories, onSelectCategory, selectedCategory }) => {
+const MyDropdown = ({ uniqueCategories, onSelectCategory, selectedCategory, ref }) => {
   const categoryItems = uniqueCategories.map((category, index) => ({
     key: `${index}`,
     label: category,
@@ -25,7 +26,8 @@ const MyDropdown = ({ uniqueCategories, onSelectCategory, selectedCategory }) =>
     <span style={{marginLeft:"10px", marginRight:"10px"}}>
         <Dropdown overlay={menu} placement="bottomCenter">
       <Button>
-        {selectedCategory ? `Category: ${selectedCategory}` : 'Filter Category'}
+        <strong style={{marginRight:"5px"}}>{selectedCategory ? `Category: ${selectedCategory}` : 'Filter Category'}</strong>
+        <DownOutlined />
       </Button>
     </Dropdown>
     </span>
