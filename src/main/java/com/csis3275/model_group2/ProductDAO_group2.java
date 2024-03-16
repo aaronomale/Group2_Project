@@ -44,4 +44,12 @@ public class ProductDAO_group2 {
 	        // Handle the case where the product with the given ID is not found
 	    	System.out.println("The product with the given ID was not found.");
 	    }
-	}}
+	}
+	 
+	public void deleteAllProducts(List<Long> idsToDelete) {
+	        for (Long id : idsToDelete) {
+	            deleteProduct(id);
+	        }
+	    }
+	
+}

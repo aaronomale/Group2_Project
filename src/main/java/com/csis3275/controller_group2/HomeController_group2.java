@@ -71,4 +71,14 @@ public class HomeController_group2 {
         dao.createProduct(newProduct);
         return ResponseEntity.status(HttpStatus.CREATED).body("Product added successfully");
     }
+    
+    @DeleteMapping("/deleteproducts")
+    public ResponseEntity<String> deleteAllProducts(@RequestBody List<Long> idsToDelete) {
+        for (Long id : idsToDelete) {
+            if (dao.findProductById(id) != null) {
+                dao.deleteProduct(id);
+            }
+        }
+        return ResponseEntity.ok("Products deleted successfully");
+    }
 }
