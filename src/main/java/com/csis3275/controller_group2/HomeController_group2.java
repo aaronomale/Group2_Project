@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.csis3275.model_group2.ProductDAO_group2;
 import com.csis3275.model_group2.Product_group2;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class HomeController_group2 {
 	
@@ -30,7 +31,7 @@ public class HomeController_group2 {
         this.dao = dao;
     }
     
-    @CrossOrigin(origins = "http://localhost:3000")
+    
     @GetMapping("/")
     public List<Product_group2> listAllProducts() {
         return dao.readAllProducts();
