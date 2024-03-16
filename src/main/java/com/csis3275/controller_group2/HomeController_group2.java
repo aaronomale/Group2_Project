@@ -75,11 +75,19 @@ public class HomeController_group2 {
     
     @DeleteMapping("/deleteproducts")
     public ResponseEntity<String> deleteAllProducts(@RequestBody List<Long> idsToDelete) {
-        for (Long id : idsToDelete) {
-            if (dao.findProductById(id) != null) {
-                dao.deleteProduct(id);
-            }
-        }
-        return ResponseEntity.ok("Products deleted successfully");
+    	if (idsToDelete.size()==1) {
+    		Long id=idsToDelete.get(0);
+    		if (dao.findProductById(id) != null) {
+    			dao.deleteProduct(id);
+    			return ResponseEntity.ok("Product deleted successfully");
+    		}else {
+    			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+    		}
+    		
+    	}else {
+    		dao.deleteAllProducts(idsToDelete);
+    		return ResponseEntity.ok("Products deleted successfully");
+    	}
+        
     }
 }
