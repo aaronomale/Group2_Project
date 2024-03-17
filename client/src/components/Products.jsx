@@ -1,12 +1,14 @@
 import React, { useState, useRef } from "react";
-import { Button, FloatButton, Switch, Table, Tag, Tour } from "antd";
+import { Button, FloatButton, Switch, Table, Tag, Tooltip, Tour, message } from "antd";
 import MyDropdown from "./MyDropdown";
 import Search from "antd/es/input/Search";
 import ProductModal from "./ProductModal";
 import ProductsStatistic from "./ProductStats";
 
 import toast, { Toaster } from 'react-hot-toast';
-// import { QuestionOutlined } from "@ant-design/icons";
+import DeleteProductsModal from "./DeleteProductModal";
+import generatePDF from "../services/reportGenerator";
+import { DownloadOutlined } from "@ant-design/icons";
 
 // Table Component
 const Products = ({data, setData, loading, categories, error, fetchData, newRef}) => {
@@ -20,30 +22,47 @@ const Products = ({data, setData, loading, categories, error, fetchData, newRef}
 
   const [editProductId, setEditProductId] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
-  
   const ref1 = useRef(null);
   const ref2 = useRef(null);
   const ref3 = useRef(null);
+  const ref4 = useRef(null);
+  const ref5 = useRef(null);
   // Tour state
   const [open, setOpen] = useState(false);
 
   // Tour steps
   const steps = [
     {
-      title: 'Select category',
-      description: 'Hover on this button to filter by category',
+      title: 'Filter by category',
+      description: 'Hover on this button to view category. And select category to filter.',
       target: () => ref1.current,
     },
     {
       title: 'Delete products',
-      description: 'Delete selected products',
+      description: 'Delete selected products by selecting the items to delete and click delete button.',
       target: () => ref2.current,
     },
     {
+      title: 'Download Report',
+      description: 'Click this to download pdf report of the current table.',
+      target: () => ref5.current,
+    },
+    {
       title: 'Toggle Low products',
-      description: 'Toggle to view products low in number.',
+      description: 'Toggle to view products to restock.',
       target: () => ref3.current,
+    },
+    {
+      title: 'Add new Product',
+      description: 'Click this button to Add new product to the inventory.',
+      target: () => newRef.current,
+    },
+    {
+      title: 'Search products',
+      description: 'Search products by name, category, or description',
+      target: () => ref4.current,
     },
   ];
 
@@ -75,8 +94,9 @@ const Products = ({data, setData, loading, categories, error, fetchData, newRef}
       key: "x",
       render: (text, record) => (
         <span className="link" onClick={() => handleEditProduct(record.id)}>
-          edit
+          Edit
         </span>
+        
       ),
     },
     {
@@ -84,9 +104,11 @@ const Products = ({data, setData, loading, categories, error, fetchData, newRef}
       dataIndex: "",
       render: (text, record) => {
         if (record.quantity < 10) {
-          return <Tag color="volcano">Restock</Tag>;
+          return <Tag color="volcano">Low</Tag>;
+        }else if(record.quantity >= 10 && record.quantity <20){
+          return <Tag color="warning">Restock</Tag>;
         }
-        return null;
+        return <Tag color="success">Ok</Tag>;
       },
     },
   ];
@@ -118,15 +140,42 @@ const Products = ({data, setData, loading, categories, error, fetchData, newRef}
     setShowLowStock(checked);
   };
 
-  // Table methods
-  const start = () => {
-    setResetLoading(true);
-    // ajax request after empty completing
-    console.log(selectedRowKeys)
-    setTimeout(() => {
+  // TABLE METHODS
+  // Delete rows
+  const handleDelete = async () => {
+    try {
+      setResetLoading(true);
+      const response = await fetch('http://localhost:8080/deleteproducts', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(selectedRowKeys)
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete products');
+      }
+      // const data = await response.text();
+      fetchData();
+      // Clear the selected row keys after successful deletion
       setSelectedRowKeys([]);
+      // Close the modal
+      handleCancelDelete();
+    } catch (error) {
+      console.error('Error deleting products:', error);
+      message.error('error', 'Failed to delete products');
+    } finally {
       setResetLoading(false);
-    }, 1000);
+    }
+  };
+
+  // Open Delete Modal
+  const handleDeleteModal = () => {
+    setIsDeleteModalVisible(true);
+  };
+  // Close delete modal
+  const handleCancelDelete = () => {
+    setIsDeleteModalVisible(false);
   };
 
   // Called each time category is changed
@@ -142,8 +191,8 @@ const Products = ({data, setData, loading, categories, error, fetchData, newRef}
 
   // Dropdown method to select category
   const handleSelectCategory = (selected) => {
-    setSelectedCategory(categories[selected.key]);
-    // Implement your logic to handle the selected category
+    const category = categories[selected.key];
+    setSelectedCategory(category);
   };
 
   // Modal methods
@@ -155,6 +204,19 @@ const Products = ({data, setData, loading, categories, error, fetchData, newRef}
   const handleCancelModal = () => {
     setIsModalVisible(false);
   };
+
+  //Download report
+  const handleDownload = ()=>{
+    if(!filteredData.length > 0){
+      message.error("Nothing to download");
+      return;
+    }
+    if(showLowStock){
+      generatePDF(filteredData, "Low Stock")
+      return;
+    }
+    generatePDF(filteredData, selectedCategory);
+  }
 
   
   if (error) {
@@ -170,6 +232,11 @@ const Products = ({data, setData, loading, categories, error, fetchData, newRef}
         onUpdate={fetchData}
         notify={notify}
       />
+      <DeleteProductsModal
+        visible={isDeleteModalVisible}
+        onCancel={handleCancelDelete}
+        onConfirm={handleDelete}
+      />
       <Toaster />
       <Tour
         open={open}
@@ -181,6 +248,7 @@ const Products = ({data, setData, loading, categories, error, fetchData, newRef}
           </span>
         )}
       />
+      <Tooltip title="Click to get a tour of the app">
       <FloatButton
       // icon={<QuestionOutlined />}
       description="Help"
@@ -192,6 +260,7 @@ const Products = ({data, setData, loading, categories, error, fetchData, newRef}
         padding: 5
       }}
     />
+    </Tooltip>
 
       <div style={{ padding: "10px" }}>
       <ProductsStatistic products={data} /> 
@@ -213,7 +282,7 @@ const Products = ({data, setData, loading, categories, error, fetchData, newRef}
             </span>
             <Button
               type="primary"
-              onClick={start}
+              onClick={handleDeleteModal}
               disabled={!hasSelected}
               loading={resetLoading}
               ref={ref2}
@@ -227,12 +296,15 @@ const Products = ({data, setData, loading, categories, error, fetchData, newRef}
             >
               {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""}
             </span>
+            <Button type="primary" onClick={handleDownload}  icon={<DownloadOutlined />} ref={ref5}>
+              Download Report
+            </Button>
           </div>
           <div>
             <span style={{ marginRight: "10px" }}>
               Show products low in stock
             </span>
-            <span ref={ref3} visible={false}>
+            <span ref={ref3} >
             <Switch
               checked={showLowStock}
               onChange={handleToggleLowStock}
@@ -247,11 +319,12 @@ const Products = ({data, setData, loading, categories, error, fetchData, newRef}
         </div>
 
         {/* Search Input */}
+        <span ref={ref4}>
         <Search
           placeholder="Search products"
           onSearch={handleSearch}
-         
         />
+        </span>
         <Table
           rowSelection={rowSelection}
           columns={columns}
