@@ -38,6 +38,7 @@ public class ProductDAO_group2 {
 	        existingProduct.setDescription(updatedProductInfo.getDescription());
 	        existingProduct.setCategory(updatedProductInfo.getCategory());
 	        existingProduct.setQuantity(updatedProductInfo.getQuantity());
+	        existingProduct.setListPrice(updatedProductInfo.getListPrice());
 	        // Save the updated student entity back to the database
 	        productRepository.save(existingProduct);
 	    } else {

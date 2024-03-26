@@ -67,7 +67,7 @@ public class HomeController_group2 {
         }
     }
 
-    @PostMapping("/products")
+    @PostMapping("/addproducts")
     public ResponseEntity<String> addProduct(@RequestBody Product_group2 newProduct) {
         dao.createProduct(newProduct);
         return ResponseEntity.status(HttpStatus.CREATED).body("Product added successfully");
