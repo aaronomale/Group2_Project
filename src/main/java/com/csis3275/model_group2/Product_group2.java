@@ -18,8 +18,17 @@ public class Product_group2 {
 	private String description;
 	private String category;
 	private int quantity;
+	private double listPrice;
 	
 	
+	
+	
+	public double getListPrice() {
+		return listPrice;
+	}
+	public void setListPrice(double price) {
+		this.listPrice = price;
+	}
 	public long getId() {
 		return id;
 	}
@@ -50,12 +59,13 @@ public class Product_group2 {
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
-	public Product_group2(String name, String description, String category, int quantity) {
-		super();
-		this.name = name;
-		this.description = description;
-		this.category = category;
-		this.quantity = quantity;
+	public Product_group2(String name, String description, String category, int quantity, double listPrice) {
+	    super();
+	    this.name = name;
+	    this.description = description;
+	    this.category = category;
+	    this.quantity = quantity;
+	    this.listPrice = listPrice; 
 	}
 	
 	public Product_group2() {
