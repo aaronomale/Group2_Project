@@ -13,13 +13,13 @@ const NewProductModal = ({ visible, setModalVisible, onCancel, notify, fetchData
       
   
       // Convert price to a number
-      // values.price = parseFloat(values.price);
       values.quantity = parseInt(values.quantity); // Convert quantity to a number
+      values.listPrice = parseFloat(values.listPrice);
   
       console.log(values);
   
       // Perform POST request to create new product
-      const response = await fetch("http://localhost:8080/products", {
+      const response = await fetch("http://localhost:8080/addproducts", {
         method: "POST",
         body: JSON.stringify(values),
         headers: {
@@ -82,6 +82,13 @@ const NewProductModal = ({ visible, setModalVisible, onCancel, notify, fetchData
         <Form.Item
           name="quantity"
           label="Quantity"
+          rules={[{ required: true, message: "Please enter the product quantity" }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          name="listPrice"
+          label="Price"
           rules={[{ required: true, message: "Please enter the product price" }]}
         >
           <Input />

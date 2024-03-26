@@ -113,6 +113,12 @@ const ProductModal = ({ productId, visible, onCancel, onUpdate, notify }) => {
         >
           <Input type="text" value={quantityInput} onChange={(e) => handleInputChange('quantity', e.target.value)} />
         </Form.Item>
+        <Form.Item
+          label="Price"
+          rules={[{ required: true, message: 'Please enter product price' }]}
+        >
+          <Input type="text" value={productData.listPrice} onChange={(e) => handleInputChange('listPrice', e.target.value)} />
+        </Form.Item>
       </Form>
     </Modal>
   );
