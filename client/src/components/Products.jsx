@@ -89,6 +89,11 @@ const Products = ({data, setData, loading, categories, error, fetchData, newRef}
       dataIndex: "quantity",
     },
     {
+      title: "Price",
+      dataIndex: "listPrice",
+      render: price => `$${price}`,
+    },
+    {
       title: "Action",
       dataIndex: "",
       key: "x",
@@ -313,7 +318,11 @@ const Products = ({data, setData, loading, categories, error, fetchData, newRef}
             />
             </span>
             <strong>
-              <Tag>{`${filteredData.length} products`}</Tag>
+              {
+                
+                filteredData.length > 1? <Tag>{`${filteredData.length } products`}</Tag> :
+                <Tag>{`${filteredData.length } product`}</Tag>
+              }
             </strong>
           </div>
         </div>

@@ -10,11 +10,11 @@ const generatePDF = (inventoryData, selectedCategory) => {
   inventoryData.forEach((item, index) => {
     const rowData = [
       index+1,
-      item.name,
-      item.description,
-      item.quantity,
-      item.price || "-", // Use dash if price is not available
-      item.category
+      item.name || "-",
+      item.description || "-",
+      item.quantity || "-",
+      "$"+item.listPrice || "-", // Use dash if price is not available
+      item.category || "-"
     ];
     tableRows.push(rowData);
   });
